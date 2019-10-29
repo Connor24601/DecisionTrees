@@ -101,7 +101,7 @@ def makeTree(data, fieldsAvailable):
 	fieldIndex = fieldsList.index(bestField)
 	fieldsAvailable.remove(bestField)
 	for fieldState in fields[bestField]:
-		filteredData = list(filter(lambda x : x[fieldIndex] == fieldState, data))
+		filteredData = list(filter(lambda x : x[fieldIndex] == fieldState, data.copy()))
 		if not filteredData:
 			if yesses >= nos:
 				tree[bestField + " = " + fieldState] = 'yes'
@@ -109,7 +109,7 @@ def makeTree(data, fieldsAvailable):
 				tree[bestField + " = " + fieldState] = 'no'
 			continue
 
-		tree[bestField + " = " + fieldState] = makeTree(filteredData, fieldsAvailable)
+		tree[bestField + " = " + fieldState] = makeTree(filteredData, fieldsAvailable.copy())
 
 	return tree
 
