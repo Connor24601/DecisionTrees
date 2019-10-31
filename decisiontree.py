@@ -34,11 +34,49 @@ def __main__():
                         line = data.readline()
         tree = makeTree(dataList, fieldsList.copy())
         
-        print()
-        printTree(tree)
-        print()
-        pruned = pruneTree(tree)
-        printTree(pruned[0])
+        #print()
+        #printTree(tree)
+        #print()
+
+		
+        #printTree(pruned)
+
+
+        print("unpruned test set accuracy: ")
+        numCorrect = 0
+        total = 0
+        for line in dataList:
+        	numCorrect += testValue(tree,line)
+        	total += 1
+        print("we got {0} entries correct and {1} entries incorrect".format(numCorrect, total-numCorrect))
+
+        pruned = pruneTree(tree)[0]
+        numCorrect = 0
+        total = 0
+        print("pruned test set accuracy: ")
+        for line in dataList:
+        	numCorrect += testValue(pruned,line)
+        	total += 1
+        print("we got {0} entries correct and {1} entries incorrect".format(numCorrect, total-numCorrect))
+
+        numCorrectPruned = 0
+        numCorrect = 0
+        total = 0
+        for line in dataList:
+        	dataCopy = dataList.copy()
+        	dataCopy.remove(line)
+        	tree = makeTree(dataCopy, fieldsList.copy())
+        	numCorrect += testValue(tree,line)
+        	prunedTree = pruneTree(tree)[0]
+        	numCorrectPruned += testValue(prunedTree,line)
+        	total += 1
+        print("leave-one-out cross-validation: unpruned")
+        print("we got {0} entries correct and {1} entries incorrect".format(numCorrect, total-numCorrect))
+        print("leave-one-out cross-validation: pruned")
+        print("we got {0} entries correct and {1} entries incorrect".format(numCorrectPruned, total-numCorrectPruned))
+
+
+
 
 def entropy(field, data):
         '''returns the entropy of choosing a given field to split on,
@@ -158,6 +196,18 @@ def pruneTree(tree):
                 else:
                         tree = ('no', (yesses, nos))
         return tree, (yesses, nos)
+
+def testValue(tree, dataLine):
+	if type(tree) == tuple:
+		return tree[0] == dataLine[-1]
+	for key in tree.keys():
+		field, fieldState = key.split(" = ")
+		fieldIndex = fieldsList.index(field)
+		if dataLine[fieldIndex] == fieldState:
+			return testValue(tree[key],dataLine)
+
+
+
 
 if __name__ == '__main__':
         __main__()
